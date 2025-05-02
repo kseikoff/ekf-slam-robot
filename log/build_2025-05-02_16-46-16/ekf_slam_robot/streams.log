@@ -1,0 +1,39 @@
+[0.469s] Invoking command in '/home/kseikoff/ros2_ws/src/ekf_slam_robot/build/ekf_slam_robot': PYTHONPATH=/home/kseikoff/ros2_ws/src/ekf_slam_robot/build/ekf_slam_robot/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/kseikoff/ros2_ws/src/ekf_slam_robot/install/ekf_slam_robot/lib/python3.10/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py develop --editable --build-directory /home/kseikoff/ros2_ws/src/ekf_slam_robot/build/ekf_slam_robot/build --no-deps symlink_data
+[0.661s] running develop
+[0.820s] running egg_info
+[0.820s] creating ekf_slam_robot.egg-info
+[0.820s] writing ekf_slam_robot.egg-info/PKG-INFO
+[0.820s] writing dependency_links to ekf_slam_robot.egg-info/dependency_links.txt
+[0.821s] writing entry points to ekf_slam_robot.egg-info/entry_points.txt
+[0.821s] writing requirements to ekf_slam_robot.egg-info/requires.txt
+[0.821s] writing top-level names to ekf_slam_robot.egg-info/top_level.txt
+[0.821s] writing manifest file 'ekf_slam_robot.egg-info/SOURCES.txt'
+[0.823s] reading manifest file 'ekf_slam_robot.egg-info/SOURCES.txt'
+[0.823s] writing manifest file 'ekf_slam_robot.egg-info/SOURCES.txt'
+[0.824s] running build_ext
+[0.825s] Creating /home/kseikoff/ros2_ws/src/ekf_slam_robot/install/ekf_slam_robot/lib/python3.10/site-packages/ekf-slam-robot.egg-link (link to .)
+[0.825s] Installing cmd_vel_publisher script to /home/kseikoff/ros2_ws/src/ekf_slam_robot/install/ekf_slam_robot/lib/ekf_slam_robot
+[0.826s] Installing obstacle_avoider script to /home/kseikoff/ros2_ws/src/ekf_slam_robot/install/ekf_slam_robot/lib/ekf_slam_robot
+[0.826s] 
+[0.826s] Installed /home/kseikoff/ros2_ws/src/ekf_slam_robot/build/ekf_slam_robot
+[0.826s] running symlink_data
+[0.826s] creating /home/kseikoff/ros2_ws/src/ekf_slam_robot/install/ekf_slam_robot/share/ament_index
+[0.826s] creating /home/kseikoff/ros2_ws/src/ekf_slam_robot/install/ekf_slam_robot/share/ament_index/resource_index
+[0.827s] creating /home/kseikoff/ros2_ws/src/ekf_slam_robot/install/ekf_slam_robot/share/ament_index/resource_index/packages
+[0.827s] symbolically linking /home/kseikoff/ros2_ws/src/ekf_slam_robot/build/ekf_slam_robot/resource/ekf_slam_robot -> /home/kseikoff/ros2_ws/src/ekf_slam_robot/install/ekf_slam_robot/share/ament_index/resource_index/packages
+[0.827s] symbolically linking /home/kseikoff/ros2_ws/src/ekf_slam_robot/build/ekf_slam_robot/package.xml -> /home/kseikoff/ros2_ws/src/ekf_slam_robot/install/ekf_slam_robot/share/ekf_slam_robot
+[0.827s] creating /home/kseikoff/ros2_ws/src/ekf_slam_robot/install/ekf_slam_robot/share/ekf_slam_robot/launch
+[0.828s] symbolically linking /home/kseikoff/ros2_ws/src/ekf_slam_robot/build/ekf_slam_robot/launch/startup.launch.py -> /home/kseikoff/ros2_ws/src/ekf_slam_robot/install/ekf_slam_robot/share/ekf_slam_robot/launch
+[0.828s] creating /home/kseikoff/ros2_ws/src/ekf_slam_robot/install/ekf_slam_robot/share/ekf_slam_robot/urdf
+[0.828s] symbolically linking /home/kseikoff/ros2_ws/src/ekf_slam_robot/build/ekf_slam_robot/urdf/materials.xacro -> /home/kseikoff/ros2_ws/src/ekf_slam_robot/install/ekf_slam_robot/share/ekf_slam_robot/urdf
+[0.828s] symbolically linking /home/kseikoff/ros2_ws/src/ekf_slam_robot/build/ekf_slam_robot/urdf/robot.xacro -> /home/kseikoff/ros2_ws/src/ekf_slam_robot/install/ekf_slam_robot/share/ekf_slam_robot/urdf
+[0.828s] symbolically linking /home/kseikoff/ros2_ws/src/ekf_slam_robot/build/ekf_slam_robot/urdf/inertial.urdf.xacro -> /home/kseikoff/ros2_ws/src/ekf_slam_robot/install/ekf_slam_robot/share/ekf_slam_robot/urdf
+[0.829s] symbolically linking /home/kseikoff/ros2_ws/src/ekf_slam_robot/build/ekf_slam_robot/urdf/wheel.xacro -> /home/kseikoff/ros2_ws/src/ekf_slam_robot/install/ekf_slam_robot/share/ekf_slam_robot/urdf
+[0.829s] symbolically linking /home/kseikoff/ros2_ws/src/ekf_slam_robot/build/ekf_slam_robot/urdf/lidar.xacro -> /home/kseikoff/ros2_ws/src/ekf_slam_robot/install/ekf_slam_robot/share/ekf_slam_robot/urdf
+[0.829s] symbolically linking /home/kseikoff/ros2_ws/src/ekf_slam_robot/build/ekf_slam_robot/urdf/robot.gazebo -> /home/kseikoff/ros2_ws/src/ekf_slam_robot/install/ekf_slam_robot/share/ekf_slam_robot/urdf
+[0.829s] creating /home/kseikoff/ros2_ws/src/ekf_slam_robot/install/ekf_slam_robot/share/ekf_slam_robot/config
+[0.830s] symbolically linking /home/kseikoff/ros2_ws/src/ekf_slam_robot/build/ekf_slam_robot/config/ekf.yaml -> /home/kseikoff/ros2_ws/src/ekf_slam_robot/install/ekf_slam_robot/share/ekf_slam_robot/config
+[0.830s] creating /home/kseikoff/ros2_ws/src/ekf_slam_robot/install/ekf_slam_robot/share/ekf_slam_robot/worlds
+[0.830s] symbolically linking /home/kseikoff/ros2_ws/src/ekf_slam_robot/build/ekf_slam_robot/worlds/empty.sdf -> /home/kseikoff/ros2_ws/src/ekf_slam_robot/install/ekf_slam_robot/share/ekf_slam_robot/worlds
+[0.830s] symbolically linking /home/kseikoff/ros2_ws/src/ekf_slam_robot/build/ekf_slam_robot/worlds/empty.world -> /home/kseikoff/ros2_ws/src/ekf_slam_robot/install/ekf_slam_robot/share/ekf_slam_robot/worlds
+[0.862s] Invoked command in '/home/kseikoff/ros2_ws/src/ekf_slam_robot/build/ekf_slam_robot' returned '0': PYTHONPATH=/home/kseikoff/ros2_ws/src/ekf_slam_robot/build/ekf_slam_robot/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/kseikoff/ros2_ws/src/ekf_slam_robot/install/ekf_slam_robot/lib/python3.10/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py develop --editable --build-directory /home/kseikoff/ros2_ws/src/ekf_slam_robot/build/ekf_slam_robot/build --no-deps symlink_data

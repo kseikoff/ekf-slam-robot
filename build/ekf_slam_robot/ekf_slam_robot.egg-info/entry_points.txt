@@ -1,0 +1,4 @@
+[console_scripts]
+cmd_vel_publisher = ekf_slam_robot.cmd_vel_publisher:main
+obstacle_avoider = ekf_slam_robot.obstacle_avoider:main
+

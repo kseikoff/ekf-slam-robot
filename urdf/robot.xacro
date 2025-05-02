@@ -1,0 +1,42 @@
+<?xml version='1.0'?>
+<robot name="robot" xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+  <xacro:include filename="robot.gazebo" />
+  <xacro:include filename="materials.xacro" />
+  <xacro:include filename="wheel.xacro" />
+  <xacro:include filename="inertial.urdf.xacro"/>
+  <xacro:include filename="lidar.xacro"/>
+
+  <link name="base_link">
+    <visual>
+      <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
+      <geometry>
+        <box size="0.2 0.2 0.1"/>
+      </geometry>
+      <material name="blue"/>
+    </visual>
+
+    <collision name="base_collision">
+      <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0" />
+      <geometry>
+        <box size="0.2 0.2 0.1" />
+      </geometry>
+    </collision>
+
+    <!-- plastic -->
+    <xacro:inertial_box mass="5.6" x="0.2" y="0.2" z="0.1">
+      <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
+    </xacro:inertial_box>
+  </link>
+
+  <!-- leading wheels (front) -->
+  <xacro:wheel side="left" x="0.08" y="0.105" z="-0.03" rx="0.0" ry="0.0" rz="0.0" ax="0" ay="1" az="0" color="blue" parent="base_link"/>
+  <xacro:wheel side="right" x="0.08" y="-0.105" z="-0.03" rx="0.0" ry="0.0" rz="0.0" ax="0" ay="1" az="0" color="blue" parent="base_link"/>
+  
+  <!-- free wheels (rear) -->
+  <xacro:wheel side="left_np" x="-0.08" y="0.105" z="-0.03" rx="0.0" ry="0.0" rz="0.0" ax="0" ay="1" az="0" color="blue" parent="base_link"/>
+  <xacro:wheel side="right_np" x="-0.08" y="-0.105" z="-0.03" rx="0.0" ry="0.0" rz="0.0" ax="0" ay="1" az="0" color="blue" parent="base_link"/>
+  
+  <!-- lidar sensor (do not rename) -->
+  <xacro:lidar name ="1" x="0.05" y="0.0" z="0.0515" rx="0.0" ry="0.0" rz="0.0" color="blue" parent="base_link"/>
+</robot>

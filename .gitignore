@@ -1,7 +1,4 @@
 /build/
 /install/
 /log/
-/devel/
-/setup.*
-/*.egg-info/
 /__pycache__/

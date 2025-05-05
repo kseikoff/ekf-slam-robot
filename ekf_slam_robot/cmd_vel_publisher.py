@@ -19,7 +19,7 @@ class CmdVelPublisher(Node):
         msg.linear.x = 0.5
         msg.angular.z = 0.0
         self.publisher_.publish(msg)
-        self.get_logger().info(f'Publishing: x={msg.linear.x}, z={msg.linear.z}')
+        # self.get_logger().info(f'Publishing: x={msg.linear.x}, z={msg.linear.z}')
 
 
 def main():

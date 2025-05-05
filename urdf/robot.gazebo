@@ -61,8 +61,9 @@
         </range>
       </ray>
 
+      <!-- for some reason lidar data is stored in the /lidar_controller/out topic -->
       <plugin name="lidar_controller" filename="libgazebo_ros_ray_sensor.so">
-        <topic_name>/diff_drive_robot/laser_1/scan</topic_name>
+        <topic_name>/diff_drive_robot/laser_1/scan</topic_name> 
         <frame_name>lidar_1</frame_name>
         <output_type>sensor_msgs/LaserScan</output_type>
       </plugin>

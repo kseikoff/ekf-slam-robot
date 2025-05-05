@@ -11,7 +11,7 @@ def generate_launch_description():
     pkg_path = get_package_share_directory('ekf_slam_robot')
     world_path = os.path.join(pkg_path, 'worlds', 'empty.world')
     urdf_path = os.path.join(pkg_path, 'urdf/robot.xacro')
-    control_cfg_path = os.path.join(pkg_path, 'config/diff_control.yaml')
+    # control_cfg_path = os.path.join(pkg_path, 'config/diff_control.yaml')
     ekf_cfg_path = os.path.join(pkg_path, 'config/ekf.yaml')
 
     robot_description = xacro.process_file(urdf_path).toxml()
@@ -42,20 +42,37 @@ def generate_launch_description():
         parameters=[{'robot_description': robot_description,
                     'use_sim_time': True}]
     )
-    controller_spawner = Node(
-        package='controller_manager',
-        executable='spawner',
-        name='controller_spawner',
-        namespace='/diff_drive_robot',
-        arguments=[
-            'wheel_left_controller',
-            'wheel_right_controller',
-            'joint_state_controller',
-            '--controller-manager-timeout', '15',
-            '--service-call-timeout', '10'
-        ],
-        output='screen',
-    )
+    # controller_manager = Node(
+    #     package='controller_manager',
+    #     executable='ros2_control_node',
+    #     parameters=[control_cfg_path],
+    #     namespace='/diff_drive_robot',
+    #     output='screen'
+    # )
+    # js_controller_spawner = Node(
+    #     package='controller_manager',
+    #     executable='spawner',
+    #     name='js_controller_spawner',
+    #     namespace='/diff_drive_robot',
+    #     arguments=[
+    #         'joint_state_controller',
+    #         '--controller-manager',
+    #         '/diff_drive_robot/controller_manager',
+    #         '--controller-manager-timeout', '15',
+    #         '--service-call-timeout', '10'
+    #     ],
+    #     output='screen',
+    # )
+    # diff_drive_controller_spawner = Node(
+    #     package='controller_manager',
+    #     executable='spawner',
+    #     name='diff_drive_controller_spawner',
+    #     namespace='/diff_drive_robot',
+    #     arguments=['diff_drive_controller',
+    #                '--controller-manager',
+    #                '/diff_drive_robot/controller_manager'],
+    #     output='screen'
+    # )
     ekf_node = Node(
         package='robot_localization',
         executable='ekf_node',
@@ -64,12 +81,12 @@ def generate_launch_description():
         parameters=[ekf_cfg_path]
     )
 
-    jspg_node = Node(
-        package='joint_state_publisher_gui',
-        executable='joint_state_publisher_gui',
-        name='joint_state_publisher_gui',
-        output='screen'
-    )
+    # jspg_node = Node(
+    #     package='joint_state_publisher_gui',
+    #     executable='joint_state_publisher_gui',
+    #     name='joint_state_publisher_gui',
+    #     output='screen'
+    # )
     rviz2_node = Node(
         package='rviz2',
         executable='rviz2',
@@ -93,14 +110,17 @@ def generate_launch_description():
     
     ld = LaunchDescription()
 
-    ld.add_action(jspg_node)
+    # ld.add_action(jspg_node)
     ld.add_action(rsp_node)
     ld.add_action(rviz2_node)
 
     ld.add_action(gz_plugin_path)
     ld.add_action(gazeboworld)
     ld.add_action(spawnmodel)
-    ld.add_action(controller_spawner)
+    
+    # ld.add_action(controller_manager)
+    # ld.add_action(js_controller_spawner)
+    # ld.add_action(diff_drive_controller_spawner)
 
     ld.add_action(ekf_node)
     ld.add_action(obstacle_avoider_node)

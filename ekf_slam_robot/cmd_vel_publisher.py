@@ -13,6 +13,7 @@ class CmdVelPublisher(Node):
         timer_period = 0.5
         self.timer = self.create_timer(timer_period, self.timer_callback)
 
+
     def timer_callback(self):
         msg = Twist()
         msg.linear.x = 0.5

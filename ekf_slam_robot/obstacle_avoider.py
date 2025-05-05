@@ -12,7 +12,7 @@ class ObstacleAvoider(Node):
         super().__init__('obstacle_avoider')
         self.subscription_scan = self.create_subscription(
             LaserScan,
-            '/scan',
+            '/diff_drive_robot/laser_1/scan',
             self.scan_callback,
             10)
         self.subscription_cmd = self.create_subscription(
@@ -27,7 +27,7 @@ class ObstacleAvoider(Node):
         self.current_cmd = Twist()
 
 
-    def scan_callback(self, msg):
+    def scan_callback(self, msg: LaserScan):
         ranges = np.array(msg.ranges)
         front_distances = ranges[self.front_angles]
         min_distance = np.min(front_distances)
@@ -39,16 +39,19 @@ class ObstacleAvoider(Node):
 
             if left_avg > right_avg:
                 twist.angular.z = 0.5
+                self.get_logger().info(f'Turning left: z={twist.angular.z}')
             else:
                 twist.angular.z = -0.5
+                self.get_logger().info(f'Turning right: z={twist.angular.z}')
         else:
             twist.linear.x = self.current_cmd.linear.x
             twist.angular.z = self.current_cmd.angular.z
+            self.get_logger().info(f'Going forward: x={twist.linear.x}, z={twist.linear.z}')
 
         self.publisher_.publish(twist)
 
 
-    def cmd_callback(self, msg):
+    def cmd_callback(self, msg: Twist):
         self.current_cmd = msg
 
 

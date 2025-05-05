@@ -11,6 +11,8 @@ def generate_launch_description():
     pkg_path = get_package_share_directory('ekf_slam_robot')
     world_path = os.path.join(pkg_path, 'worlds', 'empty.world')
     urdf_path = os.path.join(pkg_path, 'urdf/robot.xacro')
+    control_cfg_path = os.path.join(pkg_path, 'config/diff_control.yaml')
+    ekf_cfg_path = os.path.join(pkg_path, 'config/ekf.yaml')
 
     robot_description = xacro.process_file(urdf_path).toxml()
     xml = robot_description.replace('"', '\\"')
@@ -32,12 +34,6 @@ def generate_launch_description():
         output='screen'
     )
 
-    jspg_node = Node(
-        package='joint_state_publisher_gui',
-        executable='joint_state_publisher_gui',
-        name='joint_state_publisher_gui',
-        output='screen'
-    )
     rsp_node = Node(
         package='robot_state_publisher',
         executable='robot_state_publisher',
@@ -46,18 +42,19 @@ def generate_launch_description():
         parameters=[{'robot_description': robot_description,
                     'use_sim_time': True}]
     )
-    rviz2_node = Node(
-        package='rviz2',
-        executable='rviz2',
-        name='rviz2',
+    controller_spawner = Node(
+        package='controller_manager',
+        executable='spawner',
+        name='controller_spawner',
+        namespace='/diff_drive_robot',
+        arguments=[
+            'wheel_left_controller',
+            'wheel_right_controller',
+            'joint_state_controller',
+            '--controller-manager-timeout', '15',
+            '--service-call-timeout', '10'
+        ],
         output='screen',
-        arguments=['--ros-args', '-p', 'use_sim_time:=true']
-    )
-    
-    ekf_cfg_path = os.path.join(
-        pkg_path,
-        'config',
-        'ekf.yaml'
     )
     ekf_node = Node(
         package='robot_localization',
@@ -65,6 +62,20 @@ def generate_launch_description():
         name='ekf_filter_node',
         output='screen',
         parameters=[ekf_cfg_path]
+    )
+
+    jspg_node = Node(
+        package='joint_state_publisher_gui',
+        executable='joint_state_publisher_gui',
+        name='joint_state_publisher_gui',
+        output='screen'
+    )
+    rviz2_node = Node(
+        package='rviz2',
+        executable='rviz2',
+        name='rviz2',
+        output='screen',
+        arguments=['--ros-args', '-p', 'use_sim_time:=true']
     )
     
     obstacle_avoider_node = Node(
@@ -89,6 +100,7 @@ def generate_launch_description():
     ld.add_action(gz_plugin_path)
     ld.add_action(gazeboworld)
     ld.add_action(spawnmodel)
+    ld.add_action(controller_spawner)
 
     ld.add_action(ekf_node)
     ld.add_action(obstacle_avoider_node)

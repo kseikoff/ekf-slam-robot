@@ -23,6 +23,7 @@ class ObstacleAvoider(Node):
         self.r = 0.2
 
         self.obstacle_threshold = 0.7
+        self.max_lidar_range = 2.0
         self.front_angles = range(80, 100)
 
         self.get_logger().info("obstacle avoider initialized")
@@ -68,7 +69,10 @@ class ObstacleAvoider(Node):
 
     def scan_callback(self, msg: LaserScan):
         ranges = np.array(msg.ranges)
-        ranges = np.nan_to_num(ranges, nan=3.5, posinf=3.5, neginf=3.5)
+        ranges = np.nan_to_num(ranges, nan=self.max_lidar_range,
+                               posinf=self.max_lidar_range,
+                               neginf=self.max_lidar_range)
+        ranges = np.clip(ranges, 0.1, 2.0)
         angles = np.linspace(-np.pi/2, np.pi/2, len(ranges))
 
         new_landmarks = self.extract_landmarks(ranges, angles)
@@ -84,10 +88,10 @@ class ObstacleAvoider(Node):
 
         if front_clear:
             twist.linear.x = self.current_cmd.linear.x
-            twist.angular.z = angular_velocity * 0.7
+            twist.angular.z = 0.0
         else:
             twist.linear.x = max(0.0, self.current_cmd.linear.x * 0.3)
-            twist.angular.z = angular_velocity
+            twist.angular.z = angular_velocity * 1.5
 
         self.cmd_pub.publish(twist)
 

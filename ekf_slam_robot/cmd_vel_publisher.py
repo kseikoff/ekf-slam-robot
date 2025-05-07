@@ -15,7 +15,7 @@ class CmdVelPublisher(Node):
 
     def timer_callback(self):
         msg = Twist()
-        msg.linear.x = 0.5
+        msg.linear.x = 0.2
         msg.angular.z = 0.0
         self.publisher_.publish(msg)
         # self.get_logger().info(f'Publishing: x={msg.linear.x}, z={msg.linear.z}')

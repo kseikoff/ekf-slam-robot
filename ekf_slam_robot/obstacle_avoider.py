@@ -1,99 +1,128 @@
-#!/usr/bin/env python3
-
 import rclpy
 from rclpy.node import Node
 from sensor_msgs.msg import LaserScan
 from geometry_msgs.msg import Twist
-from nav_msgs.msg import Odometry
-
 import numpy as np
 
 
 class ObstacleAvoider(Node):
     def __init__(self):
-        super().__init__('obstacle_avoider')
+        super().__init__('ekf_slam_avoider')
 
         self.create_subscription(LaserScan, '/lidar_controller/out', self.scan_callback, 10)
-        self.create_subscription(Odometry, '/odometry/filtered', self.odom_callback, 10)
         self.create_subscription(Twist, '/desired_cmd_vel', self.cmd_callback, 10)
-
         self.cmd_pub = self.create_publisher(Twist, '/cmd_vel', 10)
+
+        self.current_cmd = Twist()
+        self.pose = np.array([0.0, 0.0, 0.0])  # x, y, theta
+        self.cov = np.eye(3) * 0.1
+        self.landmarks = []  # list of [x, y]
+
+        self.dt = 0.1
+        self.q = 0.05
+        self.r = 0.2
 
         self.obstacle_threshold = 0.7
         self.front_angles = range(80, 100)
-        self.current_cmd = Twist()
-        self.current_pose = np.zeros(3)
 
-        self.get_logger().info("obstacle avoider node initialized")
+        self.get_logger().info("obstacle avoider initialized")
 
+    def cmd_callback(self, msg: Twist):
+        self.current_cmd = msg
+        self.predict_step()
+
+    def predict_step(self):
+        x, y, theta = self.pose
+        v = self.current_cmd.linear.x
+        w = self.current_cmd.angular.z
+
+        theta_new = theta + w * self.dt
+        x_new = x + v * np.cos(theta) * self.dt
+        y_new = y + v * np.sin(theta) * self.dt
+
+        self.pose = np.array([x_new, y_new, theta_new])
+
+        F = np.array([
+            [1, 0, -v * np.sin(theta) * self.dt],
+            [0, 1,  v * np.cos(theta) * self.dt],
+            [0, 0, 1]
+        ])
+
+        self.cov = F @ self.cov @ F.T + np.eye(3) * self.q
+
+    def get_safe_direction(self, ranges, num_bins=18):
+        sector_size = len(ranges) // num_bins
+        safe_scores = []
+
+        for i in range(num_bins):
+            start_idx = i * sector_size
+            end_idx = (i + 1) * sector_size if i < num_bins - 1 else len(ranges)
+            sector_ranges = ranges[start_idx:end_idx]
+            avg_distance = np.mean(sector_ranges[np.isfinite(sector_ranges)])
+            safe_scores.append(avg_distance)
+
+        safe_scores = np.array(safe_scores)
+        safe_direction = np.argmax(safe_scores)
+
+        return safe_direction, safe_scores
 
     def scan_callback(self, msg: LaserScan):
         ranges = np.array(msg.ranges)
-        # angles = np.linspace(msg.angle_min, msg.angle_max, len(ranges))
+        ranges = np.nan_to_num(ranges, nan=3.5, posinf=3.5, neginf=3.5)
+        angles = np.linspace(-np.pi/2, np.pi/2, len(ranges))
 
-        # x_robot, y_robot, theta_robot = self.current_pose
+        new_landmarks = self.extract_landmarks(ranges, angles)
+        self.update_step(new_landmarks)
 
-        # for i in range(len(ranges)):
-        #     r = ranges[i]
-        #     phi = angles[i]
-
-        #     if r < msg.range_min or r > msg.range_max:
-        #         continue
-
-        #     x_global = x_robot + r * np.cos(theta_robot + phi)
-        #     y_global = y_robot + r * np.sin(theta_robot + phi)
-
-        #     self.get_logger().info(f'Found object ({x_global:.2f}, {y_global:.2f})')
-
-        front_distances = ranges[self.front_angles]
-        min_distance = np.min(front_distances)
-
+        safe_dir, _ = self.get_safe_direction(ranges)
         twist = Twist()
 
-        if min_distance < self.obstacle_threshold:
-            left_min = np.min(ranges[0:80])
-            right_min = np.min(ranges[100:180])
+        target_angle = (safe_dir - 9) * (np.pi / 9)
+        angular_velocity = np.clip(target_angle * 1.0, -1.0, 1.0)
 
-            if abs(left_min-right_min) < 0.2:
-                twist.linear.x = -self.current_cmd.linear.x
-                twist.angular.z = 0.5
-                self.get_logger().info(f'Moving back: x={twist.linear.x}, z={twist.angular.z}')
-            elif left_min > right_min:
-                twist.angular.z = 0.5
-                self.get_logger().info(f'Turning right: z={twist.angular.z},\
-                                       left_min={left_min},\
-                                       right_min={right_min}')
-            else:
-                twist.angular.z = -0.5
-                self.get_logger().info(f'Turning left: z={twist.angular.z},\
-                                       left_min={left_min},\
-                                       right_min={right_min}')
-        else:
+        front_clear = np.min(ranges[80:100]) > self.obstacle_threshold
+
+        if front_clear:
             twist.linear.x = self.current_cmd.linear.x
-            twist.angular.z = self.current_cmd.angular.z
-            self.get_logger().info(f'Moving forward: x={twist.linear.x}, z={twist.angular.z}')
+            twist.angular.z = angular_velocity * 0.7
+        else:
+            twist.linear.x = max(0.0, self.current_cmd.linear.x * 0.3)
+            twist.angular.z = angular_velocity
 
         self.cmd_pub.publish(twist)
 
+    def extract_landmarks(self, ranges, angles):
+        grads = np.gradient(ranges)
+        peaks = np.where(np.abs(grads) > 0.4)[0]
+        landmarks = []
 
-    def odom_callback(self, msg: Odometry):
-        x = msg.pose.pose.position.x
-        y = msg.pose.pose.position.y
-        quat = msg.pose.pose.orientation
-        theta = self.quaternion_to_yaw(quat)
-        self.current_pose = np.array([x, y, theta])
+        x_r, y_r, theta = self.pose
 
+        for i in peaks:
+            r = ranges[i]
+            if np.isinf(r) or r < 0.2 or r > 5.0:
+                continue
+            angle = angles[i]
+            lx = x_r + r * np.cos(theta + angle)
+            ly = y_r + r * np.sin(theta + angle)
+            landmarks.append((lx, ly))
+        return landmarks
 
-    def cmd_callback(self, msg: Twist):
-        self.get_logger().info('Connection with node established', once=True)
-        self.current_cmd = msg
-
-
-    def quaternion_to_yaw(self, q):
-        siny_cosp = 2 * (q.w * q.z + q.x * q.y)
-        cosy_cosp = 1 - 2 * (q.y * q.y + q.z * q.z)
-        return np.arctan2(siny_cosp, cosy_cosp)
-
+    def update_step(self, observations):
+        for obs in observations:
+            ox, oy = obs
+            matched = False
+            for i, (lx, ly) in enumerate(self.landmarks):
+                dist = np.hypot(ox - lx, oy - ly)
+                if dist < 0.5:
+                    new_x = (lx + ox) / 2
+                    new_y = (ly + oy) / 2
+                    self.landmarks[i] = (new_x, new_y)
+                    matched = True
+                    break
+            if not matched:
+                self.landmarks.append((ox, oy))
+        self.get_logger().info(f"Landmarks: {len(self.landmarks)}")
 
 def main(args=None):
     rclpy.init(args=args)

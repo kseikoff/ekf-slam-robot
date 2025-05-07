@@ -13,7 +13,6 @@ class CmdVelPublisher(Node):
         timer_period = 0.5
         self.timer = self.create_timer(timer_period, self.timer_callback)
 
-
     def timer_callback(self):
         msg = Twist()
         msg.linear.x = 0.5
@@ -21,14 +20,13 @@ class CmdVelPublisher(Node):
         self.publisher_.publish(msg)
         # self.get_logger().info(f'Publishing: x={msg.linear.x}, z={msg.linear.z}')
 
-
 def main():
     rclpy.init()
     node = CmdVelPublisher()
     try:
         rclpy.spin(node)
-    except Exception as e:
-        node.get_logger().error(f'Exception: {e}')
+    except KeyboardInterrupt:
+        pass
     finally:
         node.destroy_node()
         rclpy.shutdown()

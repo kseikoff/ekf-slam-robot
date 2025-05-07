@@ -16,8 +16,6 @@ setup(
         (os.path.join('share', package_name, 'launch'), glob('launch/*.launch.py')),
         (os.path.join('share', package_name, 'urdf'), glob('urdf/*.xacro')),
         (os.path.join('share', package_name, 'urdf'), glob('urdf/*.gazebo')),
-        (os.path.join('share', package_name, 'config'), glob('config/*.yaml')),
-        (os.path.join('share', package_name, 'worlds'), glob('worlds/*.sdf')),
         (os.path.join('share', package_name, 'worlds'), glob('worlds/*.world')),
     ],
     install_requires=['setuptools'],

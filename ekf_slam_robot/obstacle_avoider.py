@@ -25,7 +25,6 @@ class ObstacleAvoider(Node):
         self.obstacle_threshold = 0.7
         self.front_angles = range(80, 100)
         self.current_cmd = Twist()
-        self.avoiding = False
 
 
     def scan_callback(self, msg: LaserScan):
@@ -35,8 +34,6 @@ class ObstacleAvoider(Node):
 
         twist = Twist()
         if min_distance < self.obstacle_threshold:
-            self.avoiding = True
-
             left_avg = np.mean(ranges[0:80])
             right_avg = np.mean(ranges[100:180])
 
@@ -47,8 +44,6 @@ class ObstacleAvoider(Node):
                 twist.angular.z = -0.5
                 self.get_logger().info(f'Turning right: z={twist.angular.z}')
         else:
-            self.avoiding = False
-
             twist.linear.x = self.current_cmd.linear.x
             twist.angular.z = self.current_cmd.angular.z
             self.get_logger().info(f'Going forward: x={twist.linear.x}, z={twist.linear.z}')
@@ -58,8 +53,7 @@ class ObstacleAvoider(Node):
 
     def cmd_callback(self, msg: Twist):
         self.get_logger().info('Connection with desired_cmd_vel node established', once=True)
-        if not self.avoiding:
-            self.current_cmd = msg
+        self.current_cmd = msg
 
 
 def main(args=None):
